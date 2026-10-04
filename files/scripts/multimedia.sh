@@ -36,7 +36,14 @@ dnf5 "${dnf_args[@]}" install \
 # build, not silently downgrade the graphics stack or skip hardware codecs.
 mesa_version=$(rpm -q --qf '%{VERSION}' "mesa-filesystem.$arch")
 for driver in mesa-va-drivers mesa-vulkan-drivers; do
-  replacement="$driver-freeworld-$mesa_version.$arch"
+  # Resolve the complete NEVRA: NAME-VERSION.ARCH is not a valid versioned
+  # DNF spec. Restrict the query to this Mesa version and native architecture.
+  replacement=$(dnf5 repoquery --available --arch="$arch" --latest-limit=1 \
+    --queryformat '%{full_nevra}' "$driver-freeworld-$mesa_version" | sort -u)
+  if [[ -z "$replacement" || "$replacement" == *$'\n'* ]]; then
+    echo "No unique $driver-freeworld package for Mesa $mesa_version on $arch" >&2
+    exit 1
+  fi
   if rpm -q --quiet "$driver.$arch"; then
     dnf5 "${dnf_args[@]}" swap "$driver.$arch" "$replacement"
   else

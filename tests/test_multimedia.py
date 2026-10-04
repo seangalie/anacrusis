@@ -58,13 +58,21 @@ elif tool == "dnf5":
     if os.environ.get("RPM_TEST_FAIL") == "1":
         print("Simulated unsatisfiable dependencies", file=sys.stderr)
         sys.exit(42)
-    command = next(arg for arg in args if arg in ("swap", "install"))
+    command = next(arg for arg in args if arg in ("swap", "install", "repoquery"))
+    if command == "repoquery":
+        if os.environ.get("RPM_TEST_MESA_MISSING") != "1":
+            name = args[-1].removesuffix("-26.2.3")
+            print(f"{name}-0:26.2.3-1.fc44.{arch}")
+        sys.exit(0)
     specs = [arg for arg in args[args.index(command) + 1:] if not arg.startswith("-")]
     if command == "swap":
         old = specs.pop(0)
         for key in matches(old):
             del state[key]
     for spec in specs:
+        if re.search(r"-\d[\d.]*\.(x86_64|aarch64)$", spec):
+            print("Invalid NAME-VERSION.ARCH package spec", file=sys.stderr)
+            sys.exit(2)
         name = re.sub(r"-[0-9].*$", "", spec)
         if not name.endswith((".x86_64", ".aarch64")):
             name += "." + arch
@@ -129,8 +137,19 @@ class MultimediaTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 installed = [argument for command in commands for argument in command]
                 self.assertEqual("intel-media-driver" in installed, arch == "x86_64")
-                self.assertIn(f"mesa-va-drivers-freeworld-26.2.3.{arch}", installed)
-                self.assertIn(f"mesa-vulkan-drivers-freeworld-26.2.3.{arch}", installed)
+                self.assertIn(f"mesa-va-drivers-freeworld-0:26.2.3-1.fc44.{arch}", installed)
+                self.assertIn(f"mesa-vulkan-drivers-freeworld-0:26.2.3-1.fc44.{arch}", installed)
+                queries = [command for command in commands if "repoquery" in command]
+                self.assertEqual(len(queries), 2)
+                for query in queries:
+                    self.assertIn(f"--arch={arch}", query)
+                    self.assertTrue(query[-1].endswith("-26.2.3"))
+
+    def test_missing_matching_mesa_fails_before_graphics_swap(self):
+        result, commands = self.run_script(RPM_TEST_MESA_MISSING="1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("No unique mesa-va-drivers-freeworld package", result.stderr)
+        self.assertFalse(any("mesa-va-drivers.x86_64" in command for command in commands))
 
     def test_base_without_existing_codec_packages(self):
         result, _ = self.run_script("aarch64", absent=True)
