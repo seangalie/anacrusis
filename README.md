@@ -18,10 +18,12 @@ signature verification passing in CI. Boot, installation, rollback, and update
 testing are still outstanding; this is not yet a release recommended for everyday
 use.
 
-The active recipe currently contains only the Fedora Kinoite base and BlueBuild's
-signing module. RPM Fusion, additional Flathub configuration, Distrobox, Homebrew,
-`ujust`, branding, and Anacrusis update policy are planned work. See the
-[roadmap and validation gates](docs/ROADMAP.md).
+The recipe now enables Anacrusis OS identity and an
+[RPM Fusion multimedia layer](docs/MULTIMEDIA.md), followed by signing. These
+additions require a new image build and runtime validation; the successful
+baseline build does not validate them. Additional Flathub configuration,
+Distrobox, Homebrew, `ujust`, visual branding, and Anacrusis update policy remain
+planned work. See the [roadmap and validation gates](docs/ROADMAP.md).
 
 ## Images and release policy
 
@@ -71,10 +73,13 @@ builder, run these from the repository root:
 bluebuild validate recipes/recipe.yml
 bluebuild generate -o Containerfile recipes/recipe.yml
 bluebuild build recipes/recipe.yml
+python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-CI also runs ShellCheck, EditorConfig checks, actionlint, and zizmor. Third-party
-actions are pinned to commit SHAs and updated through Dependabot.
+CI also runs ShellCheck, EditorConfig checks, actionlint, zizmor, and multimedia
+transaction safeguard tests. The safeguard tests simulate command responses;
+the full image build tests real dependency resolution. Third-party actions are
+pinned to commit SHAs and updated through Dependabot.
 
 Shared module configuration belongs under `recipes/modules/`, imported with
 BlueBuild's [`from-file`](https://blue-build.org/how-to/multiple-files/) syntax.

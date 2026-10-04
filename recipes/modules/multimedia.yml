@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+
+modules:
+  - type: dnf
+    repos:
+      # BlueBuild installs both RPM Fusion Free and Nonfree release packages.
+      nonfree: rpmfusion
+
+  - type: script
+    scripts:
+      - multimedia.sh

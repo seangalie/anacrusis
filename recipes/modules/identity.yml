@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-# Prepared for the identity milestone; not yet imported by recipe.yml.
+# Preserve Fedora's technical identifiers for upstream tool compatibility.
 
 type: os-release
 properties:

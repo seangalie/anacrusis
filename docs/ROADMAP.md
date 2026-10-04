@@ -6,10 +6,11 @@ the platform broadly; offer personal workflow changes through optional recipes.
 
 ## Baseline: build, publish, boot
 
-The Fedora 44 recipe builds directly from
-`quay.io/fedora-ostree-desktops/kinoite:44`, targets amd64 and arm64, and includes
-only signing. CI has built and published both architectures and verified the
-image signature. The public image index has been inspected independently.
+The initial Fedora 44 recipe built directly from
+`quay.io/fedora-ostree-desktops/kinoite:44`, targeted amd64 and arm64, and included
+only signing. CI built and published both architectures and verified the image
+signature. The public image index was inspected independently. New layers still
+need their own image builds and runtime validation.
 
 Milestone zero is complete only after these remaining checks:
 
@@ -24,8 +25,8 @@ the resulting operating system boots or that recovery works.
 
 ## Identity
 
-The proposed shared configuration is `recipes/modules/identity.yml`. It is not
-yet imported into the active recipe. It uses BlueBuild's `os-release` module to
+The shared configuration is `recipes/modules/identity.yml`, now enabled in the
+recipe. It uses BlueBuild's `os-release` module to
 set the displayed name to Anacrusis, identify the release as Anacrusis 44, and
 point project links at this repository.
 
@@ -33,10 +34,11 @@ Preserve Fedora's `ID`, `ID_LIKE`, `VERSION_ID`, and `VARIANT_ID` for upstream
 tool compatibility. Keep Plasma's layout, theme, shortcuts, and applications
 unchanged in this milestone. Cosmetic assets can follow separately.
 
-Once approved, import the configuration before signing:
+The identity configuration runs after package changes and before signing:
 
 ```yaml
 modules:
+  - from-file: modules/multimedia.yml
   - from-file: modules/identity.yml
   - type: signing
 ```
@@ -60,6 +62,12 @@ Add one layer per reviewed change, using shared configuration under
 6. bootc update staging without automatic reboot, with competing update
    mechanisms handled explicitly. Test this policy in VMs before recommending it.
 7. Light desktop branding that preserves the Fedora/KDE workflow.
+
+The first multimedia implementation is now enabled through
+`recipes/modules/multimedia.yml`; see [its package policy and validation
+requirements](MULTIMEDIA.md). The identity and multimedia changes have not yet
+completed a full image build. Validate that checkpoint before activating the
+next application infrastructure layer.
 
 Each layer must build on both architectures and receive runtime checks relevant
 to its behavior. Do not describe a planned capability as already available.
