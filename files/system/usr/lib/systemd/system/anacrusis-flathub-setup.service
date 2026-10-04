@@ -1,0 +1,16 @@
+[Unit]
+Description=Configure full Flathub for Anacrusis
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/var/lib/anacrusis/flathub-configured-v1
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+StateDirectory=anacrusis
+ExecStart=/usr/bin/flatpak remote-add --system --if-not-exists --from flathub /usr/share/flatpak/remotes.d/flathub.flatpakrepo
+ExecStart=/usr/bin/flatpak remote-modify --system --enable --gpg-verify --no-filter --subset= --enumerate --use-for-deps --url=https://dl.flathub.org/repo/ flathub
+ExecStart=/usr/bin/touch /var/lib/anacrusis/flathub-configured-v1
+TimeoutStartSec=2min
+Restart=on-failure
+RestartSec=3min

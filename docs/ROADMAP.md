@@ -39,6 +39,7 @@ The identity configuration runs after package changes and before signing:
 ```yaml
 modules:
   - from-file: modules/multimedia.yml
+  - from-file: modules/applications.yml
   - from-file: modules/identity.yml
   - type: signing
 ```
@@ -66,8 +67,11 @@ Add one layer per reviewed change, using shared configuration under
 The first multimedia implementation is now enabled through
 `recipes/modules/multimedia.yml`; see [its package policy and validation
 requirements](MULTIMEDIA.md). The identity and multimedia changes have not yet
-completed a full image build. Validate that checkpoint before activating the
-next application infrastructure layer.
+completed a full image build. The next application infrastructure checkpoint is
+prepared separately through `recipes/modules/applications.yml`: full Flathub,
+Distrobox, and retained Toolbx and Discover. See [its configuration and runtime
+checks](APPLICATIONS.md). Merge this checkpoint after the multimedia checkpoint
+passes its image builds.
 
 Each layer must build on both architectures and receive runtime checks relevant
 to its behavior. Do not describe a planned capability as already available.
@@ -85,3 +89,44 @@ before adding a variant or promising architecture coverage.
 MouseTiler, a left-side Plasma panel, and other personal desktop preferences
 belong in optional `ujust` recipes. Prefer KDE's supported configuration
 interfaces and keep user changes reversible.
+
+## Agreed baseline decisions
+
+These decisions carry forward the project brainstorming. Revisit them explicitly
+when evidence warrants a change.
+
+| Area | Decision |
+| --- | --- |
+| Desktop and kernel | Stock Fedora KDE experience and stock Fedora kernel |
+| Application store | Keep Discover; full upstream Flathub; no additional default Flatpaks for now |
+| Multimedia | RPM Fusion Free, selective Nonfree packages, full FFmpeg/GStreamer/HEIF support, Mesa VA-API and Vulkan replacements |
+| CLI and development | Toolbx, Distrobox, Homebrew, and an Anacrusis `ujust` toolbox |
+| Gaming | Optional user-selected setup |
+| Hardware variants | Separate x86_64 NVIDIA Open and T2 images; stock kernel except where T2 requires otherwise |
+| Personal preferences | Optional recipes for MouseTiler, panel placement, and application bundles |
+
+## Optional toolbox candidates
+
+Design the `ujust` framework before adding a large recipe collection. Start with
+status and diagnostics, then introduce helpers with explicit prompts, documented
+effects, and a recovery path where they modify system configuration:
+
+- System, GPU, and hardware diagnostics; explicit firmware checks and updates.
+- Optional CLI/developer/AI tools and Flatpak application bundles.
+- KDE layout and MouseTiler helpers using supported KDE interfaces.
+- SSH hardening that verifies working key access before disabling password login.
+- TPM/LUKS enrollment that verifies hardware, Secure Boot state, the target
+  device, and a usable recovery key before enrollment. Review PCR policy rather
+  than copying one fixed policy from a personal setup guide.
+- Hardware-specific suspend tuning, and firmware extraction for a future T2
+  variant.
+
+Investigate Fedora's existing firewall behavior for KDE Connect and mDNS before
+adding rules. Research snapshots for user data separately from image rollback;
+do not layer a traditional root Snapper workflow onto bootc. Evaluate SMB/CIFS
+documentation and multimedia thumbnail integration against the actual KDE base
+before installing additional services or packages.
+
+Personal DNS providers, private-network agents, large personal font collections,
+and blanket service disabling stay outside the default image. The personal setup
+guides are sources of candidate recipes, not specifications to apply wholesale.

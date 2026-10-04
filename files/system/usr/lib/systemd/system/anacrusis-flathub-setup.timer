@@ -1,0 +1,9 @@
+[Unit]
+Description=Initialize Anacrusis Flathub after boot
+
+[Timer]
+OnBootSec=30s
+Unit=anacrusis-flathub-setup.service
+
+[Install]
+WantedBy=timers.target
