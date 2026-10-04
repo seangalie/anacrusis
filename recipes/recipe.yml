@@ -16,4 +16,6 @@ platforms:
   - linux/arm64
 
 modules:
+  - from-file: modules/multimedia.yml
+  - from-file: modules/identity.yml
   - type: signing

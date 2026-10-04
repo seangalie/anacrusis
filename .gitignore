@@ -11,6 +11,9 @@ cosign.private
 *.iso
 *.iso-CHECKSUM
 
+# Python regression-test bytecode.
+__pycache__/
+
 # ---------------------------------
 # .gitignore for Linux environments
 # ---------------------------------
@@ -153,4 +156,3 @@ CLAUDE.local.md
 
 # Ionide (F#) workspace state
 .ionide
-
