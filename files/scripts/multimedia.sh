@@ -76,8 +76,11 @@ done < "$work_dir/removed"
 # appear successful after an upstream package rename or dependency change.
 rpm -q ffmpeg ffmpeg-libs gstreamer1-plugin-libav \
   gstreamer1-plugins-bad-freeworld gstreamer1-plugins-ugly \
-  libheif-freeworld heif-pixbuf-loader \
+  libheif-freeworld \
   "mesa-va-drivers-freeworld.$arch" "mesa-vulkan-drivers-freeworld.$arch"
+# Fedora 44's gdk-pixbuf2 provides this capability through Glycin; it is no
+# longer a standalone RPM. Check its installed provider, not its package name.
+rpm -q --whatprovides heif-pixbuf-loader
 if [[ "$arch" == x86_64 ]]; then
   rpm -q intel-media-driver
 fi

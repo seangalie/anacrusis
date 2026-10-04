@@ -11,7 +11,9 @@ the installed user's machine.
   Fusion's `ffmpeg` and `ffmpeg-libs`.
 - Install Fedora's `gstreamer1-plugin-libav` together with RPM Fusion's
   `gstreamer1-plugins-bad-freeworld` and `gstreamer1-plugins-ugly`.
-- Add `libheif-freeworld` and Fedora's `heif-pixbuf-loader` for HEIF support.
+- Add `libheif-freeworld` and require Fedora's `heif-pixbuf-loader` capability
+  for HEIF support. Fedora 44's `gdk-pixbuf2` provides that capability through
+  Glycin; verify the installed provider rather than requiring a standalone RPM.
 - Replace the native architecture's Mesa VA-API and Vulkan driver packages with
   their freeworld equivalents for hardware video codecs.
 - Install `intel-media-driver` on x86_64 only. ARM builds use the shared Mesa
@@ -23,6 +25,9 @@ for x86_64 and aarch64. Fedora's current FFmpeg GStreamer plugin is
 rather than the historical `gstreamer1-libav` name. RPM Fusion's Fedora 44 Mesa
 packages provide VA-API and Vulkan drivers; the old `mesa-vdpau-drivers-freeworld`
 package is absent from these repositories.
+
+Fedora documents the HEIF loader compatibility provide in its
+[`gdk-pixbuf2` package metadata](https://packages.fedoraproject.org/pkgs/gdk-pixbuf2/gdk-pixbuf2/fedora-44-updates.html).
 
 References: [RPM Fusion package repositories](https://download1.rpmfusion.org/free/fedora/),
 [Mesa freeworld source](https://github.com/rpmfusion/mesa-freeworld), and

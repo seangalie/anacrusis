@@ -46,6 +46,8 @@ if tool == "rpm":
                 specs.append(arg)
         for spec in specs:
             keys = matches(spec)
+            if "--whatprovides" in args and spec == "heif-pixbuf-loader":
+                keys = matches("gdk-pixbuf2")
             if not keys:
                 sys.exit(1)
             if "--qf" in args:
@@ -74,6 +76,8 @@ elif tool == "dnf5":
             print("Invalid NAME-VERSION.ARCH package spec", file=sys.stderr)
             sys.exit(2)
         name = re.sub(r"-[0-9].*$", "", spec)
+        if name == "heif-pixbuf-loader":
+            name = "gdk-pixbuf2"
         if not name.endswith((".x86_64", ".aarch64")):
             name += "." + arch
         if spec != os.environ.get("RPM_TEST_OMIT"):
@@ -167,6 +171,10 @@ class MultimediaTests(unittest.TestCase):
 
     def test_successful_command_with_missing_required_package_fails(self):
         result, _ = self.run_script(RPM_TEST_OMIT="libheif-freeworld")
+        self.assertNotEqual(result.returncode, 0)
+
+    def test_missing_heif_capability_provider_fails(self):
+        result, _ = self.run_script(RPM_TEST_OMIT="heif-pixbuf-loader")
         self.assertNotEqual(result.returncode, 0)
 
     def test_unknown_architecture_fails_before_mutation(self):
