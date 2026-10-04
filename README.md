@@ -1,43 +1,86 @@
-# anacrusis &nbsp; [![bluebuild build badge](https://github.com/seangalie/anacrusis/actions/workflows/build.yml/badge.svg)](https://github.com/seangalie/anacrusis/actions/workflows/build.yml)
+# Anacrusis
 
-See the [BlueBuild docs](https://blue-build.org/how-to/setup/) for quick setup instructions for setting up your own repository based on this template.
+[![Image build](https://github.com/seangalie/anacrusis/actions/workflows/build.yml/badge.svg)](https://github.com/seangalie/anacrusis/actions/workflows/build.yml)
+[![Lint](https://github.com/seangalie/anacrusis/actions/workflows/lint.yml/badge.svg)](https://github.com/seangalie/anacrusis/actions/workflows/lint.yml)
 
-After setup, it is recommended you update this README to describe your custom image.
+An independent atomic KDE desktop based on Fedora Kinoite, built with
+[BlueBuild](https://blue-build.org).
 
-## Installation
+Anacrusis keeps Fedora's Plasma experience familiar and adds platform capabilities
+in small, verifiable stages. Personal desktop preferences belong in optional
+recipes rather than the default image.
 
-> [!WARNING]  
-> [This is an experimental feature](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable), try at your own discretion.
+## Current status
 
-To rebase an existing atomic Fedora installation to the latest build:
+Anacrusis is in early development. The initial Fedora Kinoite 44 image has built
+and published successfully for both `linux/amd64` and `linux/arm64`, with Cosign
+signature verification passing in CI. Boot, installation, rollback, and update
+testing are still outstanding; this is not yet a release recommended for everyday
+use.
 
-- First rebase to the unsigned image, to get the proper signing keys and policies installed:
-  ```
-  rpm-ostree rebase ostree-unverified-registry:ghcr.io/seangalie/anacrusis:latest
-  ```
-- Reboot to complete the rebase:
-  ```
-  systemctl reboot
-  ```
-- Then rebase to the signed image, like so:
-  ```
-  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/seangalie/anacrusis:latest
-  ```
-- Reboot again to complete the installation
-  ```
-  systemctl reboot
-  ```
+The active recipe currently contains only the Fedora Kinoite base and BlueBuild's
+signing module. RPM Fusion, additional Flathub configuration, Distrobox, Homebrew,
+`ujust`, branding, and Anacrusis update policy are planned work. See the
+[roadmap and validation gates](docs/ROADMAP.md).
 
-The `latest` tag will automatically point to the latest build. That build will still always use the Fedora version specified in `recipe.yml`, so you won't get accidentally updated to the next major version.
+## Images and release policy
 
-## ISO
+| Image | Architectures | Purpose |
+| --- | --- | --- |
+| `ghcr.io/seangalie/anacrusis:44` | amd64, arm64 | Fedora 44 development baseline |
 
-If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/#_top). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+Track an explicit Fedora release tag. Updates to `44` stay on Fedora 44; a major
+upgrade will require choosing a new release tag. Do not track `latest`: any tag
+left over from the Workshop demo is not the Anacrusis release channel.
 
-## Verification
+The base image is `quay.io/fedora-ostree-desktops/kinoite:44`. This direct Fedora
+desktop OCI dependency is an architectural choice we will revisit if Fedora
+establishes a different supported desktop source.
 
-These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running the following command:
+## Verification and development testing
 
-```bash
-cosign verify --key cosign.pub ghcr.io/seangalie/anacrusis
+From a checkout of this repository, with
+[Cosign installed](https://docs.sigstore.dev/cosign/system_config/installation/),
+verify the published image against the project's public key:
+
+```sh
+cosign verify --key cosign.pub ghcr.io/seangalie/anacrusis:44
 ```
+
+Inspect the image index without downloading the desktop image:
+
+```sh
+docker buildx imagetools inspect ghcr.io/seangalie/anacrusis:44
+```
+
+The index should contain both `linux/amd64` and `linux/arm64`. BuildKit also adds
+attestation entries reported as `unknown/unknown`; those are not bootable images.
+
+Installation instructions will follow disposable VM testing of the initial
+rebase, signing trust, boot, update, and rollback paths. The project intends to
+use bootc for image management; the baseline build alone does not validate that
+workflow. No Anacrusis installation ISO is published yet.
+
+## Contributing
+
+Keep changes small enough that each image build tests one new layer. With the
+[BlueBuild CLI](https://blue-build.org/how-to/local/) and a working Linux container
+builder, run these from the repository root:
+
+```sh
+bluebuild validate recipes/recipe.yml
+bluebuild generate -o Containerfile recipes/recipe.yml
+bluebuild build recipes/recipe.yml
+```
+
+CI also runs ShellCheck, EditorConfig checks, actionlint, and zizmor. Third-party
+actions are pinned to commit SHAs and updated through Dependabot.
+
+Shared module configuration belongs under `recipes/modules/`, imported with
+BlueBuild's [`from-file`](https://blue-build.org/how-to/multiple-files/) syntax.
+The top-level `modules/` directory is reserved for custom module implementations.
+System files go under `files/system/`; build scripts go under `files/scripts/`.
+Neither directory changes the image until a recipe references it.
+
+See [AGENTS.md](AGENTS.md) for repository conventions and
+[GitHub Issues](https://github.com/seangalie/anacrusis/issues) to report problems.

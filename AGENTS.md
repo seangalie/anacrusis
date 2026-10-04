@@ -7,8 +7,8 @@ instructions belong here, not there.
 
 anacrusis is an independent atomic KDE desktop: a bootable OCI image built on
 Fedora Kinoite (`quay.io/fedora-ostree-desktops/kinoite`) with
-[BlueBuild](https://blue-build.org). Users install it by rebasing an existing
-Fedora Atomic system with `rpm-ostree rebase` (see the README). There is no
+[BlueBuild](https://blue-build.org). Installation, boot, update, and rollback
+validation are still pending; see the README and `docs/ROADMAP.md`. There is no
 application code: the repository is a BlueBuild recipe plus the files, scripts,
 and modules it pulls into the image. Images are published to
 `ghcr.io/seangalie/anacrusis` for `linux/amd64` and `linux/arm64`, and signed
@@ -39,6 +39,8 @@ before relying on CI to catch mistakes.
 - `recipes/recipe.yml` -- the image definition: base image, Fedora version,
   platforms, and the ordered list of modules. Its first line points
   yaml-language-server at the recipe schema.
+- `recipes/modules/` -- shared module configuration imported with `from-file`.
+  Files here are inactive until a recipe references them.
 - `files/system/` -- files to copy into the image, laid out as they appear
   from `/` (`files/system/etc/...` becomes `/etc/...`). This only happens once
   the recipe includes a `files` module with `source: system` and

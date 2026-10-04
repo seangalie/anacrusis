@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# Prepared for the identity milestone; not yet imported by recipe.yml.
+
+type: os-release
+properties:
+  NAME: Anacrusis
+  PRETTY_NAME: Anacrusis 44
+  VARIANT: Anacrusis
+  HOME_URL: https://github.com/seangalie/anacrusis
+  DOCUMENTATION_URL: https://github.com/seangalie/anacrusis/blob/main/README.md
+  SUPPORT_URL: https://github.com/seangalie/anacrusis/issues
+  BUG_REPORT_URL: https://github.com/seangalie/anacrusis/issues

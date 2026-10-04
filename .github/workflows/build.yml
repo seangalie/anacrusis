@@ -15,7 +15,7 @@ permissions:
 
 # Only one build per ref at a time. A newer push to a pull request supersedes its
 # running build, but builds of main are never cancelled: cancelling one between
-# pushing the image and signing it would leave an unsigned :latest, which breaks
+# pushing the image and signing it would leave an unsigned :44, which breaks
 # `rpm-ostree rebase ostree-image-signed:...` for everyone.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
