@@ -19,10 +19,12 @@ testing are still outstanding; this is not yet a release recommended for everyda
 use.
 
 The recipe now enables Anacrusis OS identity and an
-[RPM Fusion multimedia layer](docs/MULTIMEDIA.md), followed by signing. These
+[RPM Fusion multimedia layer](docs/MULTIMEDIA.md), plus
+[full Flathub and Distrobox alongside Toolbx](docs/APPLICATIONS.md), followed by
+signing. These
 additions require a new image build and runtime validation; the successful
-baseline build does not validate them. Additional Flathub configuration,
-Distrobox, Homebrew, `ujust`, visual branding, and Anacrusis update policy remain
+baseline build does not validate them. Homebrew, `ujust`, visual branding, and
+Anacrusis update policy remain
 planned work. See the [roadmap and validation gates](docs/ROADMAP.md).
 
 ## Images and release policy
@@ -76,8 +78,9 @@ bluebuild build recipes/recipe.yml
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-CI also runs ShellCheck, EditorConfig checks, actionlint, zizmor, and multimedia
-transaction safeguard tests. The safeguard tests simulate command responses;
+CI also runs ShellCheck, EditorConfig checks, actionlint, zizmor, multimedia
+transaction safeguard tests, and a native Flatpak configuration smoke check.
+The multimedia safeguard tests simulate command responses;
 the full image build tests real dependency resolution. Third-party actions are
 pinned to commit SHAs and updated through Dependabot.
 

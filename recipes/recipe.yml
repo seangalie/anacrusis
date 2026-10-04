@@ -17,5 +17,6 @@ platforms:
 
 modules:
   - from-file: modules/multimedia.yml
+  - from-file: modules/applications.yml
   - from-file: modules/identity.yml
   - type: signing

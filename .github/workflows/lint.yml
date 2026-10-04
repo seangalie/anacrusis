@@ -23,6 +23,25 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  flathub-check:
+    name: Native Flathub configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y flatpak
+      - name: Check service units
+        # Flatpak is installed above, so verify the real ExecStart paths too.
+        run: systemd-analyze verify files/system/usr/lib/systemd/system/anacrusis-flathub-setup.service files/system/usr/lib/systemd/system/anacrusis-flathub-setup.timer
+      - name: Check fresh and existing Flathub remotes
+        run: sudo python3 tests/check_flathub.py
+
   multimedia-tests:
     name: Multimedia transaction safeguards
     runs-on: ubuntu-latest

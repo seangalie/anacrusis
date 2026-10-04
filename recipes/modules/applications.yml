@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+
+modules:
+  - type: dnf
+    install:
+      packages:
+        - distrobox
+        - toolbox
+
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  - type: systemd
+    system:
+      enabled:
+        - anacrusis-flathub-setup.timer
+
+  - type: script
+    snippets:
+      - rpm -q distrobox toolbox podman flatpak plasma-discover plasma-discover-flatpak
+      - systemd-analyze verify /usr/lib/systemd/system/anacrusis-flathub-setup.service /usr/lib/systemd/system/anacrusis-flathub-setup.timer
