@@ -1,0 +1,42 @@
+# EditorConfig keeps indentation and line endings consistent across editors.
+# It complements .gitattributes, which enforces the same line endings in git.
+# See https://editorconfig.org -- most editors need a plugin to honor this.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,json,jsonc,toml}]
+indent_size = 2
+
+[*.{js,jsx,ts,tsx,css,scss,html,htm,svg}]
+indent_size = 2
+
+[*.{sh,bash}]
+indent_size = 2
+
+[Makefile]
+indent_style = tab
+
+[*.md]
+# Two trailing spaces are a hard line break in Markdown.
+trim_trailing_whitespace = false
+# List continuation and nested code blocks follow the list marker, not a
+# fixed step, so there is no single indent size to enforce.
+indent_size = unset
+
+[LICENSE]
+# Verbatim license text; its layout is not ours to change.
+indent_style = unset
+indent_size = unset
+
+[.gitignore]
+# The macOS "Icon\r" pattern needs a literal carriage return mid-line, which
+# editorconfig-checker would otherwise report as a wrong line ending.
+end_of_line = unset

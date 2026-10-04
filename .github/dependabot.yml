@@ -1,6 +1,28 @@
+---
+# Keeps the SHA-pinned actions in .github/workflows current. Dependabot updates
+# both the commit SHA and the trailing version comment.
+#
+# Reference: https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+
 version: 2
+
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    # Wait a week before proposing a new release, so a compromised or broken
+    # version has time to be caught and yanked upstream first. This matters
+    # most for blue-build/github-action, which handles the image signing key.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "ci"
+    groups:
+      # One PR per week for all action bumps instead of one PR per action.
+      github-actions:
+        patterns:
+          - "*"

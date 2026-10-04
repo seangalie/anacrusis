@@ -1,27 +1,37 @@
+---
 name: bluebuild
 on:
   schedule:
-    - cron:
-        "00 06 * * *" # build at 06:00 UTC every day
-        # (20 minutes after last ublue images start building)
+    - cron: "00 06 * * *" # build at 06:00 UTC every day to pick up base image updates
   push:
     paths-ignore: # don't rebuild if only documentation has changed
       - "**.md"
 
   pull_request:
   workflow_dispatch: # allow manually triggering builds
+
+permissions:
+  contents: read
+
+# Only one build per ref at a time. A newer push to a pull request supersedes its
+# running build, but builds of main are never cancelled: cancelling one between
+# pushing the image and signing it would leave an unsigned :latest, which breaks
+# `rpm-ostree rebase ostree-image-signed:...` for everyone.
 concurrency:
-  # only run one build at a time
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   bluebuild:
     name: Build Custom Image
     runs-on: ubuntu-latest
+    # Generous because arm64 is built under emulation. Tighten once real build
+    # times are known; the point is to stop a hung build, not a slow one.
+    timeout-minutes: 240
     permissions:
       contents: read
-      packages: write
-      id-token: write
+      packages: write # push the image to ghcr.io
+      id-token: write # OIDC token for Sigstore signing and attestation
     strategy:
       fail-fast: false # stop GH from cancelling all matrix builds if one fails
       matrix:
@@ -31,7 +41,7 @@ jobs:
     steps:
       # the build is fully handled by the reusable github action
       - name: Build Custom Image
-        uses: blue-build/github-action@v1.13
+        uses: blue-build/github-action@c295af864f2802fc6aea227507af43d35823db81 # v1.13.0
         with:
           recipe: ${{ matrix.recipe }}
           cosign_private_key: ${{ secrets.SIGNING_SECRET }}
