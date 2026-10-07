@@ -11,6 +11,24 @@ cosign.private
 *.iso
 *.iso-CHECKSUM
 
+# ----------------------------------
+# Test artifacts and Python caches
+# ----------------------------------
+
+# Bytecode written when the tests under tests/ run. Ignored everywhere so it
+# can never end up under files/ and ship in the image.
+__pycache__/
+*.py[cod]
+
+# Caches and reports from optional local test, lint, and type-check tools.
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+
 # ---------------------------------
 # .gitignore for Linux environments
 # ---------------------------------
